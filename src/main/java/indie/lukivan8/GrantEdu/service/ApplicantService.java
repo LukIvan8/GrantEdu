@@ -1,12 +1,18 @@
 package indie.lukivan8.GrantEdu.service;
 
-import indie.lukivan8.GrantEdu.model.entity.Applicant;
-import indie.lukivan8.GrantEdu.model.repository.ApplicantRepo;
 import indie.lukivan8.GrantEdu.model.dto.RegisterDTO;
+import indie.lukivan8.GrantEdu.model.entity.Applicant;
 import indie.lukivan8.GrantEdu.model.entity.Role;
+import indie.lukivan8.GrantEdu.model.repository.ApplicantRepo;
 import indie.lukivan8.GrantEdu.model.repository.RoleRepo;
+import indie.lukivan8.GrantEdu.security.JwtTokenUtil;
 import indie.lukivan8.GrantEdu.utils.MappingUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,11 +28,14 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class ApplicantService implements UserDetailsService {
+public class ApplicantService {
     private final ApplicantRepo applicantRepo;
     private final BCryptPasswordEncoder passwordEncoder;
     private final MappingUtils mapping;
     private final RoleRepo roleRepo;
+    private final DaoAuthenticationProvider manager;
+    private final JwtTokenUtil jwtTokenUtil;
+    private final ApplicantDetailsService applicantDetailsService;
 
     public List<Applicant> getListOfUsers() {
         return applicantRepo.findAll();
@@ -45,11 +54,22 @@ public class ApplicantService implements UserDetailsService {
         return applicantRepo.findByUid(dto.getUid()) != null;
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String uid) throws UsernameNotFoundException {
-        Applicant applicant = applicantRepo.findByUid(uid);
-        Collection<GrantedAuthority> authorities = new ArrayList<>(applicant.getRoles());
-        return new User(applicant.getUsername(), applicant.getPassword(), authorities);
+    public String createToken(String uid, String password) throws Exception {
+
+        try {
+            manager.authenticate(new UsernamePasswordAuthenticationToken(uid, password));
+        } catch (DisabledException e) {
+            throw new Exception("USER_DISABLED", e);
+        } catch (BadCredentialsException e) {
+            throw new Exception("INVALID_CREDENTIALS", e);
+        }
+
+        final UserDetails userDetails = applicantDetailsService.loadUserByUsername(uid);
+
+        return jwtTokenUtil.generateToken(userDetails);
     }
+
+
+
 }
 

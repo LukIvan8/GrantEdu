@@ -1,8 +1,10 @@
 package indie.lukivan8.GrantEdu.controller;
 
+import indie.lukivan8.GrantEdu.model.dto.JwtRequest;
+import indie.lukivan8.GrantEdu.model.dto.JwtResponse;
+import indie.lukivan8.GrantEdu.model.dto.RegisterDTO;
 import indie.lukivan8.GrantEdu.model.entity.Applicant;
 import indie.lukivan8.GrantEdu.service.ApplicantService;
-import indie.lukivan8.GrantEdu.model.dto.RegisterDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +31,12 @@ public class ApplicantController {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
         return ResponseEntity.ok(applicantService.createUser(dto));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestBody JwtRequest req)
+            throws Exception {
+        return ResponseEntity.ok(new JwtResponse(applicantService.createToken(req.getUid(), req.getPassword())));
     }
 
 }

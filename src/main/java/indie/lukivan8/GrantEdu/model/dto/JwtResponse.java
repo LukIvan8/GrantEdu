@@ -1,14 +1,11 @@
 package indie.lukivan8.GrantEdu.model.dto;
 
-import java.io.Serializable;
 
-public class JwtResponse implements Serializable {
-
-    private static final long serialVersionUID = -8091879091924046844L;
+public class JwtResponse {
     private final String jwttoken;
 
-    public JwtResponse(String jwttoken) {
-        this.jwttoken = jwttoken;
+    public JwtResponse(String jwtToken) {
+        this.jwttoken = jwtToken;
     }
 
     public String getToken() {

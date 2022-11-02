@@ -1,10 +1,15 @@
 package indie.lukivan8.GrantEdu.controller;
 
+import indie.lukivan8.GrantEdu.model.dto.GrantResponse;
+import indie.lukivan8.GrantEdu.model.dto.ScoreDTO;
 import indie.lukivan8.GrantEdu.model.entity.Grant;
 import indie.lukivan8.GrantEdu.service.GrantService;
+import indie.lukivan8.GrantEdu.service.ProjectService;
+import indie.lukivan8.GrantEdu.utils.MappingUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +24,8 @@ import java.util.List;
 @RequestMapping("/api/grant")
 public class GrantController {
     private final GrantService grantService;
+    private final ProjectService projectService;
+    private final MappingUtils mappingUtils;
 
     @GetMapping("/download/{id}")
     public ResponseEntity<ByteArrayResource> downloadFile(@PathVariable Long id) {
@@ -29,13 +36,21 @@ public class GrantController {
                 .body(new ByteArrayResource(dbFile.getData()));
     }
 
-    @PostMapping("/upload")
-    public Grant uploadFile(@RequestBody MultipartFile multipartFile, Principal principal) throws IOException {
-        return grantService.uploadGrant(multipartFile, principal);
+    @PostMapping("/upload/{project_id}")
+    public Grant uploadFile(@RequestBody MultipartFile multipartFile, Principal principal, @PathVariable Long project_id) throws IOException {
+        return grantService.uploadGrant(multipartFile, principal, project_id);
     }
 
-    @GetMapping("/display")
-    public List<Grant> displayGrants(){
-        return grantService.getAllGrants();
+    @GetMapping("/list")
+    public List<GrantResponse> displayModGrants() {
+        return grantService.getModGrants();
+    }
+
+    @PostMapping("/score/{project_id}/{id}")
+    public ResponseEntity<GrantResponse> scoreGrant(@PathVariable Long id, @PathVariable Long project_id, Principal principal, ScoreDTO scoreDTO) {
+        if(!projectService.checkModList(project_id, principal)){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return ResponseEntity.ok(mappingUtils.grantToModSafe(grantService.setScore(id, scoreDTO, principal)));
     }
 }

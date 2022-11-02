@@ -1,37 +1,19 @@
 package indie.lukivan8.GrantEdu.model.dto;
 
-import java.io.Serializable;
+import lombok.Data;
 
-public class JwtRequest implements Serializable {
+import javax.validation.constraints.NotEmpty;
 
-    private static final long serialVersionUID = 5926468583005150707L;
 
+@Data
+public class JwtRequest {
+    @NotEmpty(message = "pls provide uid")
     private String uid;
+    @NotEmpty(message = "pls, provide password")
     private String password;
-
-    //need default constructor for JSON Parsing
-    public JwtRequest() {
-
-    }
 
     public JwtRequest(String uid, String password) {
         this.setUid(uid);
         this.setPassword(password);
-    }
-
-    public String getUid() {
-        return this.uid;
-    }
-
-    public void setUid(String uid) {
-        this.uid = uid;
-    }
-
-    public String getPassword() {
-        return this.password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 }

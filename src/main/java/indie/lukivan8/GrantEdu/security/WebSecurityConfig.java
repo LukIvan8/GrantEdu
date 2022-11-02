@@ -34,6 +34,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return provider;
     }
 
+    // TODO: Shift moderator responsibilities and make moderator creation cycle
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().
@@ -41,7 +42,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 antMatchers(HttpMethod.POST, "/api/user/login").permitAll().
                 antMatchers(HttpMethod.POST, "/api/user/register").permitAll().
                 antMatchers(HttpMethod.POST, "/api/user/login/**").permitAll().
-                antMatchers("/api/grant/**").hasAuthority("ROLE_USER").
+                antMatchers("/api/grant/upload").hasAuthority("ROLE_USER").
                 antMatchers("/api/role/**").hasAuthority("ROLE_ADMIN").
                 anyRequest().authenticated().and().
                 exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().

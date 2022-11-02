@@ -1,0 +1,10 @@
+Register:
+
+{
+	"uid":"060501551001",
+	"password":"1234",
+	"fullName":"Ivan Lukov",
+	"phoneNum":"+77021544205",
+	"email":"lukivan888@gmail.com"
+}
+

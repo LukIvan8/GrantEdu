@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -32,10 +33,7 @@ public class Applicant implements UserDetails {
     @Column(name = "password")
     private String password;
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private Set<Role> roles;
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "grantId")
-    @OneToOne(mappedBy = "author")
-    private Grant grant;
+    private Set<Role> roles = new HashSet<>();
 
     @Override
     public boolean equals(Object o) {

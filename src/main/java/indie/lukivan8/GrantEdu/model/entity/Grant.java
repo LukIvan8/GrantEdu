@@ -3,12 +3,17 @@ package indie.lukivan8.GrantEdu.model.entity;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 @Table(name = "grants")
 
 public class Grant {
@@ -24,7 +29,34 @@ public class Grant {
     @JoinColumn(name = "author_id", referencedColumnName = "user_id")
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "userId")
     private Applicant author;
+    //@ManyToOne
+    // private Project project;
     @JsonIgnore
     @Lob
     private byte[] data;
+    @Column(name = "scored", columnDefinition = "BOOLEAN DEFAULT false")
+    private Boolean scored = false;
+    @Column(name = "idea_score")
+    private Short ideaScore;
+    @Column(name = "plan_score")
+    private Short planScore;
+    @Column(name = "actuality_score")
+    private Short actualityScore;
+    @OneToOne
+    @JoinColumn(name = "scorer_id", referencedColumnName = "user_id")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "userId")
+    private Applicant scorer;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Grant grant = (Grant) o;
+        return Objects.equals(getGrantId(), grant.getGrantId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getGrantId());
+    }
 }
